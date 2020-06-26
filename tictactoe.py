@@ -1,26 +1,4 @@
-def evaluate(board):
-    # horizontal
-    for r in range(3):
-        if board[r][0]==board[r][1]==board[r][2]:
-            if board[r][0]==PLAYER:
-                return SCORE
-            elif board[r][0]==OPPONENT:
-                return -SCORE
-    # vertical
-    for c in range(3):
-        if board[0][c]==board[1][c]==board[2][c]:
-            if board[0][c]==PLAYER:
-                return SCORE
-            elif board[0][c]==OPPONENT:
-                return -SCORE
-    # diagonal
-    if (board[0][0]==board[1][1]==board[2][2]) or (board[0][2]==board[1][1]==board[2][0]):
-        if board[1][1]==PLAYER:
-                return SCORE
-        elif board[1][1]==OPPONENT:
-            return -SCORE
-    # none
-    return 0
+from copy import deepcopy
 
 def movesRemaining(board): 
     for r in range(3):
@@ -29,63 +7,100 @@ def movesRemaining(board):
                 return True
     return False
 
+def checkWinner(board):
+    # horizontal
+    for r in range(3):
+        if board[r][0]!='_' and board[r][0]==board[r][1]==board[r][2]:
+            return board[r][0]
+    # vertical
+    for c in range(3):
+        if board[0][c]!='_' and board[0][c]==board[1][c]==board[2][c]:
+            return board[0][c]
+    # diagonal
+    if board[1][1]!='_' and ((board[0][0]==board[1][1]==board[2][2]) or (board[0][2]==board[1][1]==board[2][0])):
+        return board[1][1]
+    return None
+
+def terminal(board):
+    if checkWinner(board) is not None:
+        return True
+    else:
+        return movesRemaining(board) == False
+
+def evaluate(board):
+    winner = checkWinner(board)
+    if winner == AI:
+        return 1
+    elif winner == HUMAN:
+        return -1 
+    else:
+        return 0   
+
 def minimax(board,depth,maximisingPlayer):
-    if movesRemaining(board) == False: # empty space left
-        return 0
-    evaluation = evaluate(board)
-    if evaluation==SCORE or evaluation==-SCORE: # already in winning/losing position
-        return evaluation
+    if terminal(board):
+        return evaluate(board)
     if maximisingPlayer:
-        evaluation -= depth # early winning
+        evaluation = evaluate(board)
+        # evaluation -= depth # early winning
         maxEval = - float('inf') 
         for r in range(3):
             for c in range(3):
                 if board[r][c]=='_':
-                    board[r][c] = PLAYER
-                    evaluation = minimax(board,depth+1,False) 
+                    board_copy = deepcopy(board)
+                    board_copy[r][c] = AI
+                    evaluation = minimax(board_copy,depth+1,False) 
                     maxEval = max(maxEval,evaluation)
-                    board[r][c]='_'
         return maxEval
     else:
-        evaluation += depth # late losing
+        evaluation = evaluate(board)
+        # evaluation += depth # late losing
         minEval = float('inf')
         for r in range(3):
             for c in range(3):
                 if board[r][c]=='_':
-                    board[r][c] = PLAYER
-                    evaluation = minimax(board,depth+1,True) 
+                    board_copy = deepcopy(board)
+                    board_copy[r][c] = HUMAN
+                    evaluation = minimax(board_copy,depth+1,True) 
                     minEval = min(minEval,evaluation)
-                    board[r][c]='_'
         return minEval
 
 def findOptimalMove(board):
+    optimalPosition = (None,None)
+    if terminal(board):
+        return optimalPosition
     optimalScore = - float('inf')
-    optimalPosition = (-1,-1)
     for r in range(3):
         for c in range(3):
             if board[r][c] == '_':
-                board[r][c] = PLAYER
-                moveScore = minimax(board,0,False)
-                board[r][c] = '_'
+                board_copy = deepcopy(board)
+                board_copy[r][c] = AI
+                moveScore = minimax(board_copy,0,False)
                 if moveScore > optimalScore:
                     optimalScore = moveScore
                     optimalPosition = (r,c)
-    return optimalScore,optimalPosition
+    return optimalPosition
 
+def init(choice):
+    global AI
+    global HUMAN
+    if choice == 'y' or choice == 'Y':
+        HUMAN = 'X'
+        AI = 'O'
+    else:
+        HUMAN = 'O'
+        AI = 'X'
+        
 
-global PLAYER
-global OPPONENT
-global score
-PLAYER = 'X'
-OPPONENT = 'O'
-SCORE = 1
-boards = [
-    [['X','O','X'],['O','O','X'],['_','_','_']],
-    [['X','X','X'],['O','O','X'],['_','_','_']],
-    [['O','_','X'],['X','_','_'],['X','O','O']]
-]
-for board in boards:
-    for row in board:
-        print(*row)
-    optimalScore,optimalPosition = findOptimalMove(board)
-    print('\n\tScore:',optimalScore,'Position:',optimalPosition,'\n\n')
+if __name__ == '__main__':
+    AI = 'X'
+    HUMAN = 'O'
+    boards = [
+        [['X','O','X'],['O','O','X'],['_','_','_']],
+        [['X','_','_'],['O','O','_'],['_','_','X']],
+        [['O','_','X'],['X','_','_'],['X','O','O']]
+    ]
+    for board in boards:
+        for row in board:
+            print(*row)
+        optimalPosition = findOptimalMove(board)
+        print('\n\tPosition:',optimalPosition,'\n\n')
