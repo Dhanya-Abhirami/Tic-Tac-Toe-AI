@@ -36,33 +36,39 @@ def evaluate(board):
     else:
         return 0   
 
-def minimax(board,depth,maximisingPlayer):
+def minimax(board,depth,maximisingPlayer,alpha,beta):
     if terminal(board):
         return evaluate(board)
     if maximisingPlayer:
         evaluation = evaluate(board)
-        # evaluation -= depth # early winning
         maxEval = - float('inf') 
         for r in range(3):
             for c in range(3):
                 if board[r][c]=='_':
                     board_copy = deepcopy(board)
                     board_copy[r][c] = AI
-                    evaluation = minimax(board_copy,depth+1,False) 
+                    evaluation = minimax(board_copy,depth+1,False,alpha,beta) 
                     maxEval = max(maxEval,evaluation)
+                    alpha=max(maxEval,alpha)
+                    if beta<=alpha:
+                        return maxEval
         return maxEval
+        # return maxEval
     else:
         evaluation = evaluate(board)
-        # evaluation += depth # late losing
         minEval = float('inf')
         for r in range(3):
             for c in range(3):
                 if board[r][c]=='_':
                     board_copy = deepcopy(board)
                     board_copy[r][c] = HUMAN
-                    evaluation = minimax(board_copy,depth+1,True) 
+                    evaluation = minimax(board_copy,depth+1,True,alpha,beta) 
                     minEval = min(minEval,evaluation)
+                    beta=min(minEval,beta)
+                    if beta<=alpha:
+                        return minEval
         return minEval
+        # return minEval
 
 def findOptimalMove(board):
     optimalPosition = (None,None)
@@ -74,7 +80,7 @@ def findOptimalMove(board):
             if board[r][c] == '_':
                 board_copy = deepcopy(board)
                 board_copy[r][c] = AI
-                moveScore = minimax(board_copy,0,False)
+                moveScore = minimax(board_copy,1,False,-float('inf'),float('inf'))
                 if moveScore > optimalScore:
                     optimalScore = moveScore
                     optimalPosition = (r,c)
