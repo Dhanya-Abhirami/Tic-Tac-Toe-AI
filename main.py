@@ -1,7 +1,6 @@
 import pygame
 import time
-from tictactoe import findOptimalMove,checkWinner,terminal
-
+import tictactoe as ttt
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 (WIDTH, HEIGHT) = (440, 440)
@@ -62,7 +61,7 @@ while running:
 					choice = 'n'
 				elif event.key == pygame.K_y:
 					choice = 'y'
-				init(choice)
+				ttt.init(choice)
 				if choice == 'y' or choice == 'Y':
 					HUMAN = 'X'
 					AI = 'O'
@@ -79,7 +78,7 @@ while running:
 				else:
 					DesText('Your turn')
 				if currentPlayer == AI:
-					(r1,c1) = findOptimalMove(board)
+					(r1,c1) = ttt.findOptimalMove(board)
 					if (r1,c1) != (None,None):
 						board[r1][c1] = AI
 						mark(AI,r1,c1)
@@ -94,9 +93,9 @@ while running:
 								mark(HUMAN,r,c)
 								currentPlayer = AI
 				pygame.display.update()
-				if terminal(board):
+				if ttt.terminal(board):
 					gameOver = True
-					winner = checkWinner(board)
+					winner = ttt.checkWinner(board)
 					if winner!=None:
 						if winner == AI:
 							DesText('AI wins!')
