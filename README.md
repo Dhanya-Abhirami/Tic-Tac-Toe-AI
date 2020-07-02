@@ -6,3 +6,4 @@ Used techniques like Minimax Algorithm, Alpha-Beta pruning, adversarial search f
 ### Todo
 - [ ] Connect Four Game
 - [ ] Sudoku Solver
+- [ ] 2048 Game https://github.com/Lesaun/2048-expectimax-ai
