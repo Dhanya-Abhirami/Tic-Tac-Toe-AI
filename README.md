@@ -1,4 +1,4 @@
-# Beat It
+# Tic-Tac-Toe AI
 Created AI bot/agent to play Tic Tac Toe game in Python which will always try to pick the best possible move. 
 <br>
 Used techniques like Minimax Algorithm, Alpha-Beta pruning, adversarial search to optimize game-play.
